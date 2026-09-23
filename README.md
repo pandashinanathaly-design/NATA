@@ -1,6 +1,85 @@
 
 DESCARGAR JAR
+
 https://downloads.mysql.com/archives/c-j/
+***************ESTO ES DE LA TABLA ***************
+package tabla;
+
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.JTable;
+import java.sql.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+/**
+ *
+ * @author Admin
+ */
+public class JTablaNataly extends JTable{
+    public void cargar(String db, String tabla, String campo) {
+        try (Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + db, "root", "");
+             ResultSet rs = c.createStatement().executeQuery("SELECT * FROM " + tabla)) {
+            
+            ResultSetMetaData m = rs.getMetaData();
+            DefaultTableModel mod = new DefaultTableModel();
+            for (int i = 1; i <= m.getColumnCount(); i++) mod.addColumn(m.getColumnName(i));
+            while (rs.next()) {
+                Object[] fila = new Object[m.getColumnCount()];
+                for (int i = 0; i < m.getColumnCount(); i++) fila[i] = rs.getObject(i + 1);
+                mod.addRow(fila);
+            }
+            setModel(mod);
+
+            for (int i = 0; i < m.getColumnCount(); i++) {
+                if (m.getColumnName(i + 1).equalsIgnoreCase(campo)) {
+                    getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
+                        public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int r, int cl) {
+                            Component comp = super.getTableCellRendererComponent(t, v, s, f, r, cl);
+                            try {
+                                double val = Double.parseDouble(v.toString());
+                                comp.setForeground(val > 7 ? new Color(0, 128, 0) : (val < 7 ? Color.RED : Color.BLACK));
+                            } catch (Exception e) {}
+                            return comp;
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {}
+    }
+}
+
+
+
+*******************CONEXION**************
+public class conexion {
+    public static Connection conectar() {
+        Connection conn = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost/kevin ","root", "");
+            JOptionPane.showMessageDialog(null, "ok esta conectado");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex);
+
+        }
+        return conn;
+    }
+}
+
+*******************INIT************
+ public prueba() {
+        initComponents();
+     jTablaNataly1.cargar("kevin","calificacion","nota");
+    }
+
+***********BOTON CONEXION ***********
+ conexion cn= new conexion();
+           cn.conectar();
+
+
+
+
+
 
 
 /*
